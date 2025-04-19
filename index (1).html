@@ -1,0 +1,292 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manatunga Electronics - Sound Equipment Rentals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 20px 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 1s ease-out; }
+        .animate-scale-in { animation: scaleIn 0.8s ease-out; }
+        .animate-pulse-glow { animation: pulseGlow 2s infinite; }
+        .animate-slide-in-left { animation: slideInLeft 1s ease-out; }
+        .animate-slide-in-right { animation: slideInRight 1s ease-out; }
+        .hover-glow:hover { box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-red-900 to-black text-white sticky top-0 z-50 animate-fade-in-up">
+        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+            <h1 class="text-4xl font-extrabold animate-slide-in-left">Manatunga Electronics</h1>
+            <nav class="space-x-6 animate-slide-in-right">
+                <a href="#home" class="hover:text-red-400 transition hover-glow">Home</a>
+                <a href="#rentals" class="hover:text-red-400 transition hover-glow">Rentals</a>
+                <a href="#about" class="hover:text-red-400 transition hover-glow">About</a>
+                <a href="#contact" class="hover:text-red-400 transition hover-glow">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Audio Player -->
+    <div class="fixed bottom-4 right-4 z-50 animate-scale-in">
+        <audio id="background-audio" controls autoplay loop class="bg-gray-800 p-2 rounded-lg shadow-lg hover-glow">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-gradient-to-b from-black to-red-950 text-white py-20">
+        <div class="container mx-auto px-4 text-center animate-fade-in-up">
+            <h2 class="text-5xl md:text-6xl font-extrabold mb-4 animate-scale-in">Manatunga Electronics Rentals</h2>
+            <p class="text-xl md:text-2xl mb-8 animate-slide-in-left">Experience regal sound for your events – premium speakers, amps, and more!</p>
+            <a href="#rentals" class="bg-red-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-red-500 transition animate-pulse-glow">Explore Rentals</a>
+        </div>
+    </section>
+
+    <!-- Rentals Section -->
+    <section id="rentals" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-red-400 animate-fade-in-up">Our Majestic Sound Equipment</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-2 animate-scale-in hover-glow">
+                    <h3 class="text-2xl font-semibold mb-2 text-white">JBL PRX835 Speakers</h3>
+                    <p class="text-gray-400 mb-4">High-power 15” three-way speakers for crystal-clear audio.</p>
+                    <p class="text-red-400 font-bold">Rent from $50/day</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow" onclick="addToCart('JBL PRX835 Speakers', 50)">Add to Cart</button>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-2 animate-scale-in hover-glow">
+                    <h3 class="text-2xl font-semibold mb-2 text-white">QSC K12.2 Powered Speakers</h3>
+                    <p class="text-gray-400 mb-4">Portable 12” speakers with 2000W amplification.</p>
+                    <p class="text-red-400 font-bold">Rent from $40/day</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow" onclick="addToCart('QSC K12.2 Speakers', 40)">Add to Cart</button>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-2 animate-scale-in hover-glow">
+                    <h3 class="text-2xl font-semibold mb-2 text-white">Amplifiers</h3>
+                    <p class="text-gray-400 mb-4">High-performance amplifiers for powerful audio.</p>
+                    <p class="text-red-400 font-bold">Rent from $30/day</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow" onclick="addToCart('Amplifier', 30)">Add to Cart</button>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-2 animate-scale-in hover-glow">
+                    <h3 class="text-2xl font-semibold mb-2 text-white">Shure Wireless Microphones</h3>
+                    <p class="text-gray-400 mb-4">Professional-grade wireless mics for flawless performances.</p>
+                    <p class="text-red-400 font-bold">Rent from $20/day</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow" onclick="addToCart('Shure Wireless Microphone', 20)">Add to Cart</button>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-2 animate-scale-in hover-glow">
+                    <h3 class="text-2xl font-semibold mb-2 text-white">Mixing Consoles</h3>
+                    <p class="text-gray-400 mb-4">Digital and analog mixers for precise audio control.</p>
+                    <p class="text-red-400 font-bold">Rent from $35/day</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow" onclick="addToCart('Mixing Console', 35)">Add to Cart</button>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-2 animate-scale-in hover-glow">
+                    <h3 class="text-2xl font-semibold mb-2 text-white">Karaoke Systems</h3>
+                    <p class="text-gray-400 mb-4">Complete karaoke setup with over 40,000 songs.</p>
+                    <p class="text-red-400 font-bold">Rent from $60/day</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow" onclick="addToCart('Karaoke System', 60)">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Deals Section -->
+    <section class="bg-gray-950 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-red-400 animate-fade-in-up">Royal Deals</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 animate-slide-in-left hover-glow">
+                    <h3 class="text-2xl font-semibold mb-2 text-white">Concert Package</h3>
+                    <p class="text-gray-400 mb-4">2 JBL PRX835 speakers, 1 amplifier, 2 wireless mics for $120/day (save 20%).</p>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow" onclick="addToCart('Concert Package', 120)">Grab Deal</button>
+                </div>
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 animate-slide-in-right hover-glow">
+                    <h3 class="text-2xl font-semibold mb-2 text-white">Party Bundle</h3>
+                    <p class="text-gray-400 mb-4">QSC K12.2 speakers, karaoke system, and mixing console for $100/day (save 15%).</p>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow" onclick="addToCart('Party Bundle', 100)">Grab Deal</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-8 text-red-400 animate-fade-in-up">About Manatunga Electronics</h2>
+            <p class="text-gray-400 max-w-3xl mx-auto animate-slide-in-left">With over a decade of excellence, Manatunga Electronics reigns as your premier choice for sound equipment rentals. Our top-tier, meticulously maintained audio gear elevates events from weddings to grand concerts. Our royal service ensures seamless setup and support for an unforgettable experience.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="bg-gray-950 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-red-400 animate-fade-in-up">Contact Our Kingdom</h2>
+            <div class="max-w-lg mx-auto">
+                <p class="text-gray-400 mb-4 text-center animate-slide-in-right">For inquiries about our regal sound equipment rentals, visit us or connect via Dima.TV, Facebook, or our royal form.</p>
+                <form id="contact-form" class="animate-scale-in">
+                    <input type="text" id="name" placeholder="Your Name" class="w-full p-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-500 hover-glow" required>
+                    <input type="email" id="email" placeholder="Your Email" class="w-full p-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-500 hover-glow" required>
+                    <textarea id="message" placeholder="Your Message" rows="5" class="w-full p-3 mb-4 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-500 hover-glow" required></textarea>
+                    <button type="submit" class="bg-red-600 text-white px-6 py-3 rounded-full hover:bg-red-500 transition animate-pulse-glow">Send Message</button>
+                </form>
+                <div class="mt-6 text-center animate-fade-in-up">
+                    <p class="text-gray-400">Visit or contact us via:</p>
+                    <p class="text-red-400 font-semibold">
+                        <a href="https://maps.app.goo.gl/5jDoWFemH6LZYcm3A" target="_blank" class="hover:text-red-300 transition hover-glow">Location: No. 123, Main Street, Colombo, Sri Lanka (View on Google Maps)</a>
+                    </p>
+                    <p class="text-red-400 font-semibold">
+                        <a href="https://www.facebook.com/pemantha.manathunga" target="_blank" class="hover:text-red-300 transition hover-glow">Facebook: @PemanthaManathunga</a>
+                    </p>
+                    <p class="text-red-400 font-semibold">Dima.TV: @ManatungaElectronics</p>
+                    <p class="text-red-400 font-semibold">Phone: +94716422022</p>
+                    <p class="text-red-400 font-semibold">Email: info@manatungaelectronics.lk</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg max-w-md w-full animate-scale-in">
+            <h3 class="text-2xl font-bold mb-4 text-red-400">Your Royal Cart</h3>
+            <ul id="cart-items" class="mb-4 text-gray-100"></ul>
+            <p id="cart-total" class="font-semibold text-red-400"></p>
+            <div class="flex justify-end space-x-4">
+                <button onclick="closeCart()" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition hover-glow">Close</button>
+                <button onclick="checkout()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition animate-pulse-glow">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black text-gray-400 py-6">
+        <div class="container mx-auto px-4 text-center animate-fade-in-up">
+            <p>© 2025 Manatunga Electronics. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let cart = [];
+
+        function addToCart(item, price) {
+            cart.push({ item, price });
+            alert(`${item} added to your royal cart!`);
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            cartItems.innerHTML = '';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${item.item} - $${item.price}/day`;
+                li.classList.add('animate-fade-in-up');
+                cartItems.appendChild(li);
+                total += item.price;
+            });
+
+            cartTotal.textContent = `Total: $${total}/day`;
+        }
+
+        function openCart() {
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function closeCart() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your royal cart is empty!');
+                return;
+            }
+            alert('Thank you for your rental request! Our kingdom will contact you to confirm.');
+            cart = [];
+            updateCart();
+            closeCart();
+        }
+
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            if (name && email && message) {
+                alert('Your message has been received by the kingdom! We will respond soon.');
+                document.getElementById('contact-form').reset();
+            } else {
+                alert('Please fill in all fields to proceed.');
+            }
+        });
+
+        // Audio volume control
+        const audio = document.getElementById('background-audio');
+        audio.volume = 0.3; // Set initial volume to 30% for a subtle effect
+    </script>
+</body>
+</html>
